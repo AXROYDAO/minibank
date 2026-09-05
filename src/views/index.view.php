@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MINIBANK // NERV Financial System</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
     <div class="bg-rei"></div>
@@ -128,7 +128,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($transactions as $t): ?>
+                        <?php foreach ($transactions as $t) { ?>
                         <tr class="table__row <?= $t['type'] === 'income' ? 'table__row--income' : 'table__row--expense' ?>">
                             <td class="table__td"><?= htmlspecialchars($t['date']) ?></td>
                             <td class="table__td">
@@ -149,7 +149,7 @@
                                 </form>
                             </td>
                         </tr>
-                        <?php endforeach; ?>
+                        <?php } ?>
                     </tbody>
                 </table>
             </div>
@@ -173,6 +173,6 @@
         </footer>
     </div>
 
-    <script src="app.js"></script>
+    <script src="/js/app.js"></script>
 </body>
 </html>

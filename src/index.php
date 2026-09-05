@@ -2,10 +2,14 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/classes/BankAccount.php';
+// Подключаем один единственный файл автозагрузчика из корня:
+require_once __DIR__.'/../vendor/autoload.php';
+
+// Импортируем наш класс через use:
+use App\BankAccount;
 
 session_start();
-if (!isset($_SESSION['transactions'])) {
+if (! isset($_SESSION['transactions'])) {
     $_SESSION['transactions'] = [];
 }
 
@@ -17,11 +21,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($action === 'clear_all') {
         $account->clearAllTransactions();
-    } 
+    }
 
     if ($action === 'add_transaction') {
         $type = $_POST['type'] ?? 'expense';
-        $amount = (float)($_POST['amount'] ?? 0);
+        $amount = (float) ($_POST['amount'] ?? 0);
         $category = $_POST['category'] ?? 'Другое';
         $comment = $_POST['comment'] ?? '';
 
@@ -45,6 +49,4 @@ $balance = $account->getBalance();
 $income = $account->getIncome();
 $expenses = $account->getExpenses();
 
-require_once __DIR__ . '/views/index.view.php';
-
-?>
+require_once __DIR__.'/views/index.view.php';
