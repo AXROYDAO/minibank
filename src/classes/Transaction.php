@@ -7,6 +7,7 @@ namespace App;
 final readonly class Transaction
 {
     public function __construct(
+        // type можно сделать enum. Будет намного проще чекни что это
         public string $type,
         public float $amount,
         public string $category,

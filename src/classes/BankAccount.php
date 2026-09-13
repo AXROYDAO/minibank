@@ -41,6 +41,7 @@ final readonly class BankAccount
 
     public function addTransaction(Transaction $transaction): void
     {
+        // репозиторий в модели добавлять плохая идея. но для первого проекта норм
         $this->repository->save($transaction);
     }
 

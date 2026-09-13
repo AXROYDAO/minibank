@@ -7,6 +7,9 @@ namespace App;
 use App\BankAccount;
 use App\Transaction;
 
+// nit: final readonly 
+// контролер какой то тослетый. можно было вынести бизнес логику в action классы или TransactionService
+// в идеале метод контроллера должен быть в 1-5 строк
 class TransactionController
 {
     public function __construct(private BankAccount $account, private CurrencyService $currencyService)
@@ -15,18 +18,21 @@ class TransactionController
 
     public function index(): void
     {
-    $filter = $_GET['filter'] ?? 'all';
-    $transactions = $this->account->getTransactions($filter);
-    $balance = $this->account->getBalance();
-    $income = $this->account->getIncome();
-    $expenses = $this->account->getExpenses();
-    try {
-        $actualRate = $this->currencyService->getRate('EUR');
-    } catch (\Exception $e) {
-        $actualRate = 1.0;
-    }
-    $balanceEuro = $balance * $actualRate;
-    require_once __DIR__.'/../views/index.view.php';
+        // а че с табуляцией
+        $filter = $_GET['filter'] ?? 'all';
+        $transactions = $this->account->getTransactions($filter);
+        $balance = $this->account->getBalance();
+        $income = $this->account->getIncome();
+        $expenses = $this->account->getExpenses();
+        try {
+            $actualRate = $this->currencyService->getRate('EUR');
+        } catch (\Exception $e) {
+            $actualRate = 1.0;
+        }
+        $balanceEuro = $balance * $actualRate;
+        require_once __DIR__.'/../views/index.view.php';
+        // вот так должно быть
+        // и пробелов между кодом нету; тяжку читать
     }
 
     public function store(): void
