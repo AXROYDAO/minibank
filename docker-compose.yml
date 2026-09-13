@@ -13,6 +13,8 @@ services:
 
   php-fpm:
     build: ./.docker/php-fpm
+    # working_dir: /var/www
+    # у меня он открылся в /var/www/html
     volumes:
       - .:/var/www
     depends_on:

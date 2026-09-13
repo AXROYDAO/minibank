@@ -6,6 +6,7 @@ namespace App;
 
 use PDO;
 
+// мое почтение; классно разделил репозиторий, контроллер и модель
 class TransactionRepository
 {
     private PDO $pdo;
