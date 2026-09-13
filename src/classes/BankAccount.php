@@ -4,21 +4,18 @@ declare(strict_types=1);
 
 namespace App;
 
-class BankAccount
+final readonly class BankAccount
 {
-    private $transactions = [];
-
-    public function __construct(array $initial_transactions = [])
+    public function __construct(private TransactionRepository $repository)
     {
-        $this->transactions = $initial_transactions;
     }
 
     public function getIncome(): float
     {
         $income = 0.0;
-        foreach ($this->transactions as $transaction) {
-            if ($transaction['type'] === 'income') {
-                $income += $transaction['amount'];
+        foreach ($this->getTransactions() as $transaction) {
+            if ($transaction->isIncome()) {
+                $income += $transaction->getAmount();
             }
         }
 
@@ -28,9 +25,9 @@ class BankAccount
     public function getExpenses(): float
     {
         $expenses = 0.0;
-        foreach ($this->transactions as $transaction) {
-            if ($transaction['type'] === 'expense') {
-                $expenses += $transaction['amount'];
+        foreach ($this->getTransactions() as $transaction) {
+            if ($transaction->isExpense()) {
+                $expenses += $transaction->getAmount();
             }
         }
 
@@ -42,44 +39,33 @@ class BankAccount
         return $this->getIncome() - $this->getExpenses();
     }
 
-    public function addTransaction(string $type, float $amount, string $category, string $comment): void
+    public function addTransaction(Transaction $transaction): void
     {
-        $transaction = [
-            'id' => uniqid(),
-            'type' => $type,
-            'amount' => $amount,
-            'category' => $category,
-            'comment' => $comment,
-            'date' => date('Y-m-d H:i'),
-        ];
-        $this->transactions[] = $transaction;
-    }
-
-    public function clearAllTransactions(): void
-    {
-        $this->transactions = [];
-    }
-
-    public function deleteTransaction(string $id): void
-    {
-        $this->transactions = array_filter($this->transactions, function ($t) use ($id) {
-            return $t['id'] !== $id;
-        });
+        $this->repository->save($transaction);
     }
 
     public function getTransactions(string $filter = 'all'): array
     {
+        $transactions = $this->repository->findAll();
+
         if ($filter === 'income') {
-            return array_filter($this->transactions, function ($t) {
-                return $t['type'] === 'income';
-            });
-        }
-        if ($filter === 'expense') {
-            return array_filter($this->transactions, function ($t) {
-                return $t['type'] === 'expense';
-            });
+            return array_filter($transactions, fn(Transaction $t) => $t->isIncome());
         }
 
-        return $this->transactions;
+        if ($filter === 'expense') {
+            return array_filter($transactions, fn(Transaction $t) => $t->isExpense());
+        }
+
+        return $transactions;
+    }
+
+    public function deleteTransaction(string $id): void
+    {
+        $this->repository->deleteById($id);
+    }
+
+    public function deleteAllTransactions(): void
+    {
+        $this->repository->deleteAll();
     }
 }

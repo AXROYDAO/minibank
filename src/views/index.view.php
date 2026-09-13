@@ -27,6 +27,7 @@
                 <div class="stats__value">
                     <?= $balance >= 0 ? '+' : '' ?>
                     <?= number_format($balance, 2, '.', ' ') ?> ₽
+                    <p>Баланс в EUR: <?= number_format($balanceEuro, 2, '.', ' ') ?> € (курс: <?= number_format($actualRate, 4) ?>)</p>
                 </div>
                 <div class="stats__bar"></div>
             </div>
@@ -53,7 +54,7 @@
                 ДОБАВИТЬ ОПЕРАЦИЮ
                 <span class="section-title__bracket">]</span>
             </h2>
-            <form method="POST" class="transaction-form">
+           <form action="/transactions" method="POST" class="transaction-form">
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label">ТИП ОПЕРАЦИИ</label>
@@ -110,49 +111,60 @@
         </section>
 
         <!-- ===== TRANSACTIONS TABLE ===== -->
-        <section class="table-section">
-            <h2 class="section-title">
-                <span class="section-title__bracket">[</span>
-                ИСТОРИЯ ОПЕРАЦИЙ
-                <span class="section-title__bracket">]</span>
-            </h2>
-            <div class="table-wrapper">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th class="table__th">ДАТА И ВРЕМЯ</th>
-                            <th class="table__th">КАТЕГОРИЯ</th>
-                            <th class="table__th">ОПИСАНИЕ</th>
-                            <th class="table__th table__th--right">СУММА</th>
-                            <th class="table__th table__th--center">ДЕЙСТВИЕ</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($transactions as $t) { ?>
-                        <tr class="table__row <?= $t['type'] === 'income' ? 'table__row--income' : 'table__row--expense' ?>">
-                            <td class="table__td"><?= htmlspecialchars($t['date']) ?></td>
-                            <td class="table__td">
-                                <span class="badge badge--<?= $t['type'] ?>">
-                                    <?= htmlspecialchars($t['category']) ?>
-                                </span>
-                            </td>
-                            <td class="table__td"><?= htmlspecialchars($t['comment']) ?></td>
-                            <td class="table__td table__td--amount <?= $t['type'] === 'income' ? 'amount--income' : 'amount--expense' ?>">
-                                <?= $t['type'] === 'income' ? '+' : '-' ?>
-                                <?= number_format($t['amount'], 2, '.', ' ') ?> ₽
-                            </td>
-                            <td class="table__td table__td--center">
-                                <form method="POST" class="delete-form">
-                                    <button type="submit" name="delete_id" value="<?= $t['id'] ?>" class="delete-btn" title="Удалить">
-                                        ✕
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                        <?php } ?>
-                    </tbody>
-                </table>
-            </div>
+<section class="table-section">
+    <h2 class="section-title">
+        <span class="section-title__bracket">[</span>
+        ИСТОРИЯ ОПЕРАЦИЙ
+        <span class="section-title__bracket">]</span>
+    </h2>
+    <div class="table-wrapper">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th class="table__th">ДАТА И ВРЕМЯ</th>
+                    <th class="table__th">КАТЕГОРИЯ</th>
+                    <th class="table__th">ОПИСАНИЕ</th>
+                    <th class="table__th table__th--right">СУММА</th>
+                    <th class="table__th table__th--center">ДЕЙСТВИЕ</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($transactions as $t) { ?>
+                <tr class="table__row <?= $t->isIncome() ? 'table__row--income' : 'table__row--expense' ?>">
+                    <td class="table__td"><?= htmlspecialchars($t->getDate()) ?></td>
+                    <td class="table__td">
+                        <span class="badge badge--<?= htmlspecialchars($t->getType()) ?>">
+                            <?= htmlspecialchars($t->getCategory()) ?>
+                        </span>
+                    </td>
+                    <td class="table__td"><?= htmlspecialchars($t->getComment()) ?></td>
+                    <td class="table__td table__td--amount <?= $t->isIncome() ? 'amount--income' : 'amount--expense' ?>">
+                        <?= $t->isIncome() ? '+' : '-' ?>
+                        <?= number_format($t->getAmount(), 2, '.', ' ') ?> ₽
+                    </td>
+                    <td class="table__td table__td--center">
+                        <form action="/transactions/delete" method="POST" class="delete-form">
+                            <button type="submit" name="delete_id" value="<?= htmlspecialchars($t->getId()) ?>" class="delete-btn" title="Удалить">
+                                ✕
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                <?php } ?>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- CLEAR ALL -->
+    <div class="clear-section">
+        <form action="/transactions/clear" method="POST">
+            <button type="submit" name="action" value="clear_all" class="clear-btn">
+                <span class="clear-btn__text">Очистить всё</span>
+                <span class="clear-btn__glow"></span>
+            </button>
+        </form>
+    </div>
+</section>
 
             <!-- CLEAR ALL -->
             <div class="clear-section">
